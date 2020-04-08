@@ -15,6 +15,7 @@ class SettingsViewController: UIViewController {
     // MARK: - View Lifecycle
     
     override func viewDidLoad() {
+        setUpSubviews()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -24,11 +25,12 @@ class SettingsViewController: UIViewController {
     
     // MARK: - Action Handlers
     
-    func changeShouldShowPluto(_ sender: UISwitch) {
+    @objc func changeShouldShowPluto(_ sender: UISwitch) {
         let userDefaults = UserDefaults.standard
         userDefaults.set(sender.isOn, forKey: .shouldShowPlutoKey)
     }
     
+    //exposed to object C, the @objc
     @objc func done() {
         dismiss(animated: true, completion: nil)
     }
@@ -38,5 +40,46 @@ class SettingsViewController: UIViewController {
     private func updateViews() {
         let userDefaults = UserDefaults.standard
         shouldShowPlutoSwitch.isOn = userDefaults.bool(forKey: .shouldShowPlutoKey)
+    }
+    
+    private func setUpSubviews() {
+        //Button
+        
+        let doneButton = UIButton(type: .system)
+        doneButton.translatesAutoresizingMaskIntoConstraints = false
+        doneButton.setTitle("Done", for: .normal)
+        doneButton.addTarget(self, action: #selector(done), for: .touchUpInside)
+        
+        view.addSubview(doneButton)
+        
+        let doneButtonTopConstraint = doneButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20)
+        
+        let doneButtonTrailingConstraint = NSLayoutConstraint(item: doneButton, attribute: .trailing, relatedBy: .equal, toItem: view.safeAreaLayoutGuide, attribute: .trailing, multiplier: 1, constant: -20)
+        
+        
+        //switch
+        shouldShowPlutoSwitch.translatesAutoresizingMaskIntoConstraints = false
+        shouldShowPlutoSwitch.addTarget(self, action: #selector(changeShouldShowPluto(_:)), for: .valueChanged)
+        view.addSubview(shouldShowPlutoSwitch)
+        
+        let switchTopConstraint = shouldShowPlutoSwitch.topAnchor.constraint(equalTo: doneButton.bottomAnchor, constant: 60)
+        
+        let switchTrailingConstraint = shouldShowPlutoSwitch.trailingAnchor.constraint(equalTo: doneButton.trailingAnchor)
+        
+        //Label
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Is Pluto a planet?"
+        view.addSubview(label)
+        
+        let labelLeadingConstraint = label.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20)
+        
+        let labelCenterYConstraint = label.centerYAnchor.constraint(equalTo: shouldShowPlutoSwitch.centerYAnchor)
+        
+        //aligns the top of the switch instead of the bottom of the switch (not visually symetrical in the y view)
+        let labelTopConstraint = label.topAnchor.constraint(equalTo: shouldShowPlutoSwitch.topAnchor)
+        
+        
+        NSLayoutConstraint.activate([doneButtonTopConstraint, doneButtonTrailingConstraint, switchTopConstraint, switchTrailingConstraint, labelLeadingConstraint, labelCenterYConstraint])
     }
 }
